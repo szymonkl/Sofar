@@ -1,0 +1,49 @@
+input_number:
+  sofar_target_soc_0700:
+    name: SOFAR target SOC 07:00
+    min: 20
+    max: 90
+    step: 1
+    unit_of_measurement: "%"
+
+  sofar_target_soc_peak:
+    name: SOFAR target SOC peak
+    min: 20
+    max: 90
+    step: 1
+    unit_of_measurement: "%"
+
+  sofar_p80_morning_load:
+    name: SOFAR P80 load 07-13
+    min: 0
+    max: 30
+    step: 0.1
+    unit_of_measurement: "kWh"
+
+  sofar_p80_peak_load:
+    name: SOFAR P80 peak load
+    min: 0
+    max: 30
+    step: 0.1
+    unit_of_measurement: "kWh"
+
+  sofar_pv_morning_forecast:
+    name: SOFAR PV 07-13 forecast
+    min: 0
+    max: 30
+    step: 0.1
+    unit_of_measurement: "kWh"
+
+  sofar_pv_peak_forecast:
+    name: SOFAR PV peak forecast
+    min: 0
+    max: 30
+    step: 0.1
+    unit_of_measurement: "kWh"
+
+input_boolean:
+  sofar_g13_enable:
+    name: SOFAR G13 control
+
+  sofar_grid_charge:
+    name: SOFAR grid charging

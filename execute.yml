@@ -1,0 +1,78 @@
+alias: "SOFAR G13 - execute grid charge"
+id: sofar_g13_execute_grid_charge
+mode: restart
+
+triggers:
+  - trigger: state
+    entity_id: input_boolean.sofar_grid_charge
+
+actions:
+
+  - choose:
+
+      - conditions:
+          - condition: state
+            entity_id: input_boolean.sofar_grid_charge
+            state: "on"
+
+        sequence:
+
+          - action: select.select_option
+            target:
+              entity_id: select.inverter_storage_control_mode
+            data:
+              option: "Passive"
+
+          - delay: "00:00:02"
+
+          - action: number.set_value
+            target:
+              entity_id: number.inverter_passive_grid_power
+            data:
+              value: 500
+
+          - action: number.set_value
+            target:
+              entity_id: number.inverter_passive_minimum_battery_power
+            data:
+              value: 500
+
+          - action: number.set_value
+            target:
+              entity_id: number.inverter_passive_maximum_battery_power
+            data:
+              value: 500
+
+    default:
+
+      - action: number.set_value
+        target:
+          entity_id: number.inverter_passive_grid_power
+        data:
+          value: 0
+
+      - action: number.set_value
+        target:
+          entity_id: number.inverter_passive_minimum_battery_power
+        data:
+          value: 0
+
+      - action: number.set_value
+        target:
+          entity_id: number.inverter_passive_maximum_battery_power
+        data:
+          value: 0
+
+      - delay: "00:00:02"
+
+      - action: select.select_option
+        target:
+          entity_id: select.inverter_storage_control_mode
+        data:
+          option: "Self Use"
+
+      - action: number.set_value
+        target:
+          entity_id: number.inverter_battery_eod
+        data:
+          value: 20

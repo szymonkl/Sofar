@@ -1,0 +1,75 @@
+alias: "SOFAR G13 - charge controller"
+id: sofar_g13_charge_controller
+mode: restart
+
+triggers:
+  - trigger: time_pattern
+    minutes: "/5"
+
+conditions:
+  - condition: state
+    entity_id: input_boolean.sofar_g13_enable
+    state: "on"
+
+actions:
+
+  - variables:
+
+      soc: "{{ states('sensor.inverter_battery') | float(0) }}"
+
+      winter: "{{ now().month in [10,11,12,1,2,3] }}"
+
+      hour: "{{ now().hour }}"
+
+      is_workday: >
+        {{ is_state('binary_sensor.workday_sensor', 'on') }}
+
+      night_cheap: >
+        {% if winter %}
+          {{ hour >= 21 or hour < 7 }}
+        {% else %}
+          {{ hour >= 22 or hour < 7 }}
+        {% endif %}
+
+      day_cheap: >
+        {% if winter %}
+          {{ hour >= 13 and hour < 16 }}
+        {% else %}
+          {{ hour >= 13 and hour < 19 }}
+        {% endif %}
+
+      target_soc: >
+        {% if not is_workday %}
+          20
+        {% elif night_cheap %}
+          {{ states('input_number.sofar_target_soc_0700') | float(20) }}
+        {% elif day_cheap %}
+          {{ states('input_number.sofar_target_soc_peak') | float(20) }}
+        {% else %}
+          20
+        {% endif %}
+
+      grid_charge_allowed: >
+        {{
+          is_workday
+          and (night_cheap or day_cheap)
+        }}
+
+  - choose:
+
+      - conditions:
+          - condition: template
+            value_template: >
+              {{
+                grid_charge_allowed
+                and soc < target_soc - 1
+              }}
+        sequence:
+          - action: input_boolean.turn_on
+            target:
+              entity_id: input_boolean.sofar_grid_charge
+
+    default:
+      - action: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.sofar_grid_charge
